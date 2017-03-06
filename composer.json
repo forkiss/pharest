@@ -1,0 +1,21 @@
+{
+    "name": "forkiss/pharest",
+    "type": "library",
+    "description": "pharest is a PHP library that base phalcon extension.",
+    "keywords": ["pharest", "phalcon", "restful-api"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jay Riley"
+        }
+    ],
+    "require": {
+        "php": "^7.0",
+        "ext-phalcon": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pharest\\": "src/Pharest/"
+        }
+    }
+}
