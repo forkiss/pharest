@@ -40,7 +40,7 @@ class Model extends \Phalcon\Mvc\Model
         $query = parent::findFirst($parameters);
 
         if (!$query) {
-            throw new \Pharest\Exception\NotFoundException();
+            throw new \Pharest\Exception\NotFoundException($message);
         }
 
         return $query;
