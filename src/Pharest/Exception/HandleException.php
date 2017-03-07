@@ -5,53 +5,43 @@ namespace Pharest\Exception;
 
 class HandleException
 {
-
-    /** @var \Phalcon\Http\Response $response */
-    protected $response;
-
-    /** @var  \Exception $exception */
-    protected $exception;
-
     /** @var bool $debug */
     protected $debug;
 
 
-    public function __construct(&$response, \Exception &$exception, $debug = false)
+    public function __construct($debug = false)
     {
-        $this->exception = $exception;
-        $this->response = $response;
         $this->debug = $debug;
     }
 
-    public function handle()
+    public function handle(\Phalcon\Http\Response &$response, \Exception &$exception)
     {
-        if (class_exists(\App\Exception\Handler::class)) {
+        if (class_exists(\App\Exception\Handler::class) and in_array(ExceptionHandler::class, class_implements(\App\Exception\Handler::class))) {
 
             $handler = new \App\Exception\Handler();
 
-            if (method_exists($handler, 'handle')) {
-                return $handler->handle($this->response, $this->exception, $this->debug);
-            }
-        }
+            $handler->handle($response, $exception);
 
-        if ($this->debug) {
-            $this->response->setStatusCode($this->e->getCode());
+        } elseif ($this->debug) {
 
-            $this->response->setJsonContent([
-                'message' => $this->e->getMessage(),
-                'file'    => $this->e->getFile(),
-                'line'    => $this->e->getLine()
+            $response->setStatusCode($exception->getCode());
+
+            $response->setJsonContent([
+                'message' => $exception->getMessage(),
+                'file'    => $exception->getFile(),
+                'line'    => $exception->getLine()
             ]);
         } else {
-            $this->response->setStatusCode($this->e->getCode());
 
-            $this->response->setJsonContent([
-                'code'    => $this->e->getCode(),
-                'message' => $this->e->getMessage()
+            $response->setStatusCode($exception->getCode());
+
+            $response->setJsonContent([
+                'code'    => $exception->getCode(),
+                'message' => $exception->getMessage()
             ]);
         }
 
-        return $this->response;
+        return $response;
     }
 
     /**

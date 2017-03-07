@@ -40,20 +40,13 @@ class Application
 
         $this->app->notFound(function () {
             $this->app->response->setStatusCode(404)->sendHeaders();
-            exit;
         });
 
         $this->app->error(function ($exception) {
-            if (isset($this->app) and $this->app instanceof \Phalcon\Mvc\Micro) {
-                $handler = new \Pharest\Exception\HandleException($this->app->response, $exception, $this->debug);
+            $handler = new \Pharest\Exception\HandleException($this->debug);
 
-                return $handler->handle()->send();
-            }
-
-            exit('the server is busy');
+            return $handler->handle($this->app->response, $exception);
         });
-
-        return true;
     }
 
     public function run()
