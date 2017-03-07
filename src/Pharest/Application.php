@@ -94,7 +94,9 @@ class Application
              * Database connection is created based in the parameters defined in the configuration file
              */
             $this->di->setShared('db', function () use (&$config) {
-                return new \Phalcon\Db\Adapter\Pdo\Mysql([
+                $adapter = 'Phalcon\Db\Adapter\Pdo\\' . $config->database->adapter;
+
+                return new $adapter([
                     'host'     => $config->database->host,
                     'username' => $config->database->username,
                     'password' => $config->database->password,
