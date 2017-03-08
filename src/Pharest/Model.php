@@ -35,11 +35,15 @@ abstract class Model extends \Phalcon\Mvc\Model
      *
      * @return static
      */
-    public static function firstOrFail($parameters, $message)
+    public static function firstOrFail($parameters, $message = '')
     {
         $query = parent::findFirst($parameters);
 
         if (!$query) {
+            if (!$message) {
+                $message = self::getSchema() . ' data can not be found';
+            }
+
             throw new \Pharest\Exception\NotFoundException($message);
         }
 

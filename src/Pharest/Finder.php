@@ -14,9 +14,6 @@ class Finder
     /** @var string $controller */
     protected $controller;
 
-    /** @var string $action */
-    protected $action;
-
     /**
      * Finder constructor.
      *
@@ -25,13 +22,13 @@ class Finder
     public function __construct(\Phalcon\Config $config)
     {
         if (!isset($_GET['_url'])) {
-            throw new \Pharest\Exception\FinderException();
+            $this->fail();
         }
 
         $uri = explode('/', $_GET['_url']);
 
         if (!isset($uri[1])) {
-            throw new \Pharest\Exception\FinderException();
+            $this->fail();
         }
 
         if (isset($config->version) and $config->version) {
@@ -39,21 +36,17 @@ class Finder
 
             $this->controller = $uri[2] ?? 'index';
 
-            $this->action = $uri[3] ?? 'index';
-
             $this->filename = APP_ROOT . $config->path . $this->version . '/' . $this->controller . '.php';
         } else {
             $this->version = false;
 
             $this->controller = $uri[1] ?? 'index';
 
-            $this->action = $uri[2] ?? 'index';
-
             $this->filename = APP_ROOT . $config->path . $this->controller . '.php';
         }
 
         if (!is_file($this->filename)) {
-            throw new \Pharest\Exception\FinderException();
+            $this->fail();
         }
     }
 
@@ -88,14 +81,10 @@ class Finder
         return ucfirst($this->controller);
     }
 
-    /**
-     * return current request counter action
-     *
-     * @return string
-     */
-    public function getActionName()
+    private function fail()
     {
-        return $this->action;
+        header("HTTP/1.1 404 Not Found");
+        exit;
     }
 
 }

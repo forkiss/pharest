@@ -28,13 +28,13 @@ class Application
 
         $this->debug = $config->application->debug ?? false;
 
-        $this->finder = new Finder($config->application->route);
-
         $this->registerDependency($config);
 
         $this->app = new \Phalcon\Mvc\Micro($this->di);
 
         $this->registerMiddleware();
+
+        $this->finder = new Finder($config->application->route);
 
         $this->app->mount($this->finder->getCollection());
 
@@ -86,8 +86,8 @@ class Application
          */
         require_once APP_ROOT . $config->application->dependencies->path;
 
-        $this->di->set('finder', function () {
+        $this->di->setShared('finder', function () {
             return $this->finder;
-        }, false);
+        });
     }
 }
