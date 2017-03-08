@@ -3,7 +3,7 @@
 namespace Pharest;
 
 
-class Model extends \Phalcon\Mvc\Model
+abstract class Model extends \Phalcon\Mvc\Model
 {
     /**
      * Allows to query a set of records that match the specified conditions

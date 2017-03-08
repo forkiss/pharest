@@ -11,8 +11,8 @@ class Application
     /** @var \Phalcon\Di\FactoryDefault $di */
     protected $di;
 
-    /** @var \Phalcon\Mvc\Micro\Collection $router */
-    protected $router;
+    /** @var \Phalcon\Mvc\Micro\Collection $finder */
+    protected $finder;
 
     /** @var  bool $debug */
     public $debug;
@@ -28,7 +28,7 @@ class Application
 
         $this->debug = $config->application->debug ?? false;
 
-        $this->router = new Router($config->application->route);
+        $this->finder = new Finder($config->application->route);
 
         $this->registerDependency($config);
 
@@ -36,7 +36,7 @@ class Application
 
         $this->registerMiddleware();
 
-        $this->app->mount($this->router->getRouter());
+        $this->app->mount($this->finder->getCollection());
 
         $this->app->notFound(function () {
             $this->app->response->setStatusCode(404)->sendHeaders();
@@ -58,7 +58,7 @@ class Application
         $this->app->handle();
     }
 
-    final private function registerMiddleware()
+    private final function registerMiddleware()
     {
         if (class_exists(\App\Middleware\Kernel::class)) {
             $middleware = (new \App\Middleware\Kernel())->middleware;
@@ -73,7 +73,7 @@ class Application
         return [];
     }
 
-    final private function registerDependency(\Pharest\Config &$config)
+    private final function registerDependency(\Pharest\Config &$config)
     {
         /**
          * The FactoryDefault Dependency Injector automatically registers the services that
@@ -81,33 +81,13 @@ class Application
          */
         $this->di = new \Phalcon\Di\FactoryDefault();
 
-        if (is_file(APP_ROOT . $config->application->dependencies->path)) {
-            /**
-             * include services
-             */
-            require_once APP_ROOT . $config->application->dependencies->path;
-        } else {
-            /**
-             * Shared configuration service
-             */
-            $this->di->setShared('config', function () use (&$config) {
-                return $config;
-            });
+        /**
+         * include dependencies
+         */
+        require_once APP_ROOT . $config->application->dependencies->path;
 
-            /**
-             * Database connection is created based in the parameters defined in the configuration file
-             */
-            $this->di->setShared('db', function () use (&$config) {
-                $adapter = 'Phalcon\Db\Adapter\Pdo\\' . $config->database->adapter;
-
-                return new $adapter([
-                    'host'     => $config->database->host,
-                    'username' => $config->database->username,
-                    'password' => $config->database->password,
-                    'dbname'   => $config->database->dbname,
-                    'charset'  => $config->database->charset
-                ]);
-            });
-        }
+        $this->di->set('finder', function () {
+            return $this->finder;
+        }, false);
     }
 }
