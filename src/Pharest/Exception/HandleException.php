@@ -16,7 +16,7 @@ class HandleException
 
     public function handle(\Phalcon\Http\Response &$response, \Exception &$exception)
     {
-        if (class_exists(\App\Exception\Handler::class) and in_array(ExceptionHandler::class, class_implements(\App\Exception\Handler::class))) {
+        if ($this->hasCustomHandler()) {
 
             $handler = new \App\Exception\Handler();
 
@@ -31,6 +31,7 @@ class HandleException
                 'file'    => $exception->getFile(),
                 'line'    => $exception->getLine()
             ]);
+
         } else {
 
             $response->setStatusCode($exception->getCode());
@@ -39,19 +40,25 @@ class HandleException
                 'code'    => $exception->getCode(),
                 'message' => $exception->getMessage()
             ]);
-        }
 
-        return $response;
+        }
     }
 
     /**
-     * Determine if the given exception is an Router exception.
+     * Determine if the app has custom exception handler
      *
-     * @param \Exception $e
      * @return bool
      */
-    protected function isRouterException(\Exception $e)
+    public function hasCustomHandler()
     {
-        return $e instanceof RouterException;
+        if (!class_exists(\App\Exception\Handler::class)) {
+            return false;
+        }
+
+        if (!in_array(ExceptionHandler::class, class_implements(\App\Exception\Handler::class))) {
+            return false;
+        }
+
+        return true;
     }
 }

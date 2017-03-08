@@ -40,12 +40,16 @@ class Application
 
         $this->app->notFound(function () {
             $this->app->response->setStatusCode(404)->sendHeaders();
+
+            return $this->app->response;
         });
 
         $this->app->error(function ($exception) {
             $handler = new \Pharest\Exception\HandleException($this->debug);
 
-            return $handler->handle($this->app->response, $exception);
+            $handler->handle($this->app->response, $exception);
+
+            return $this->app->response;
         });
     }
 
