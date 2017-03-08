@@ -1,9 +1,9 @@
 <?php
 
-namespace Pharest\Exception;
+namespace Pharest;
 
 
-class HandleException
+class ExceptionHandler
 {
     /** @var bool $debug */
     protected $debug;
@@ -55,7 +55,7 @@ class HandleException
             return false;
         }
 
-        if (!in_array(ExceptionHandler::class, class_implements(\App\Exception\Handler::class))) {
+        if (!in_array(\Pharest\Exception\ExceptionHandler::class, class_implements(\App\Exception\Handler::class))) {
             return false;
         }
 

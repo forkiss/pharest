@@ -45,7 +45,7 @@ class Application
         });
 
         $this->app->error(function ($exception) {
-            $handler = new \Pharest\Exception\HandleException($this->debug);
+            $handler = new ExceptionHandler($this->debug);
 
             $handler->handle($this->app->response, $exception);
 
