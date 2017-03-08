@@ -85,9 +85,5 @@ class Application
          * include dependencies
          */
         require_once APP_ROOT . $config->application->dependencies->path;
-
-        $this->di->setShared('finder', function () {
-            return $this->finder;
-        });
     }
 }
