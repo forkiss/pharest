@@ -14,6 +14,9 @@ class Application
     /** @var \Phalcon\Mvc\Micro\Collection $finder */
     protected $finder;
 
+    /** @var  string $uri */
+    protected $uri;
+
     /** @var  bool $debug */
     public $debug;
 
@@ -85,5 +88,26 @@ class Application
          * include dependencies
          */
         require_once APP_ROOT . $config->application->dependencies->path;
+
+        /**
+         * Shared configuration service
+         */
+        $config->uri = $this->di->get('request')->getURI();
+
+        $config->method = $this->di->get('request')->getMethod();
+
+        $this->di->setShared('config', function () use (&$config) {
+            $config->datetime = date('Y-m-d H:i:s');
+
+            return $config;
+        });
+
+        if (in_array($config->method, ['POST', 'PUT'])) {
+            $this->di->setShared('validator', function () {
+                $validator = new \Pharest\Validate\Validator();
+
+                return $validator;
+            });
+        }
     }
 }
