@@ -6,7 +6,7 @@ use \Phalcon\Validation\Validator as Type;
 
 class Validator extends \Phalcon\Validation
 {
-    protected $input;
+    public $input;
 
     protected $validators;
 
@@ -24,7 +24,7 @@ class Validator extends \Phalcon\Validation
 
         if ($method == 'PUT') {
             $this->input = $this->request->getPut();
-        } elseif ($this->method == 'POST') {
+        } elseif ($method == 'POST') {
             $this->input = $this->request->getPost();
         } else {
             $this->input = [];
