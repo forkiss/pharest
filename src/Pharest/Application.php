@@ -11,9 +11,6 @@ class Application
     /** @var \Phalcon\Di\FactoryDefault $di */
     protected $di;
 
-    /** @var \Phalcon\Mvc\Micro\Collection $finder */
-    protected $finder;
-
     /** @var  string $uri */
     protected $uri;
 
@@ -31,15 +28,15 @@ class Application
 
         $this->debug = $config->application->debug ?? false;
 
-        $this->registerDependency($config);
+        $finder = new Finder($config->application->route);
+
+        $this->registerDependency($config, $finder);
 
         $this->app = new \Phalcon\Mvc\Micro($this->di);
 
         $this->registerMiddleware();
 
-        $this->finder = new Finder($config->application->route);
-
-        $this->app->mount($this->finder->getCollection());
+        $this->app->mount($finder->getCollection());
 
         $this->app->notFound(function () {
             $this->app->response->setStatusCode(404)->sendHeaders();
@@ -76,7 +73,7 @@ class Application
         return [];
     }
 
-    private final function registerDependency(\Pharest\Config &$config)
+    private final function registerDependency(\Pharest\Config &$config, \Pharest\Finder &$finder)
     {
         /**
          * The FactoryDefault Dependency Injector automatically registers the services that
@@ -96,10 +93,14 @@ class Application
 
         $config->method = $this->di->get('request')->getMethod();
 
-        $this->di->setShared('config', function () use (&$config) {
-            $config->datetime = date('Y-m-d H:i:s');
+        $config->datetime = date('Y-m-d H:i:s');
 
+        $this->di->setShared('config', function () use (&$config) {
             return $config;
+        });
+
+        $this->di->setShared('finder', function () use (&$finder) {
+            return $finder;
         });
 
         if (in_array($config->method, ['POST', 'PUT'])) {
