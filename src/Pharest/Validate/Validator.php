@@ -6,7 +6,7 @@ use \Phalcon\Validation\Validator as Type;
 
 class Validator extends \Phalcon\Validation
 {
-    public $input;
+    public $input = [];
 
     protected $validators;
 
@@ -18,24 +18,13 @@ class Validator extends \Phalcon\Validation
 
     protected $notice;
 
-    public final function initialize()
+    public function __construct(\Pharest\Config &$config)
     {
-        $method = $this->request->getMethod();
+        $this->input = $this->request->get();
 
-        if ($method == 'PUT') {
-            $this->input = $this->request->getPut();
-        } elseif ($method == 'POST') {
-            $this->input = $this->request->getPost();
-        } else {
-            $this->input = [];
-        }
+        $this->init();
 
-        if (!empty($this->input)) {
-            $this->filterXss($this->input);
-        }
-
-        $this->scopes = ['keys' => [], 'detail' => ['message' => [], 'domain' => []]];
-        $this->lens = ['keys' => [], 'detail' => ['min' => [], 'messageMinimum' => [], 'max' => [], 'messageMaximum' => []]];
+        list($this->requires, $this->scopes, $this->lens) = $config->initValidatorRulers();
     }
 
     public function get($key)
@@ -43,53 +32,13 @@ class Validator extends \Phalcon\Validation
         return $this->input[$key] ?? null;
     }
 
-    public function required(string $key, string $message)
-    {
-        $this->required[$key] = [$key => $message];
-
-        return $this->get($key);
-    }
-
-    public function in(string $key, string $message, array $domain)
-    {
-        $this->scopes['keys'][] = $key;
-        $this->scopes['detail']['message'][$key] = $message;
-        $this->scopes['detail']['domain'][$key] = $domain;
-
-        $this->add($key, new Type\InclusionIn([
-            'message' => $message,
-            'domain'  => $domain
-        ]));
-    }
-
-    public function length(string $key, int $min, string $messageMinimum, int $max = null, string $messageMaximum = null)
-    {
-        $this->lens['keys'][] = $key;
-
-        $this->lens['detail']['min'][$key] = $min;
-        $this->lens['detail']['messageMinimum'][$key] = $messageMinimum;
-
-        if ($max and $messageMaximum) {
-            $this->lens['detail']['max'][$key] = $max;
-            $this->lens['detail']['messageMaximum'][$key] = $messageMaximum;
-        }
-
-        return $this->get($key);
-    }
-
     public function execute()
     {
-        if ($this->requires) {
-            $this->add(array_keys($this->requires), new Type\PresenceOf(['message' => array_values($this->requires)]));
-        }
+        $this->rule($this->requires['keys'], new Type\PresenceOf($this->requires['detail']));
 
-        if ($this->scopes) {
-            $this->add($this->scopes['keys'], new Type\InclusionIn($this->scopes['detail']));
-        }
+        $this->rule($this->scopes['keys'], new Type\InclusionIn($this->scopes['detail']));
 
-        if ($this->lens) {
-            $this->add($this->lens['keys'], new Type\StringLength($this->lens['detail']));
-        }
+        $this->rule($this->lens['keys'], new Type\StringLength($this->lens['detail']));
 
         $this->notice = $this->validate($this->input);
 
@@ -114,5 +63,42 @@ class Validator extends \Phalcon\Validation
 
             $data[$key] = preg_replace(['/[on][a-zA-Z]+(\s*)=(\s*)?[\'"]?[^\'"]+[\'"&gt;]?/i', '/>/'], '', $data[$key]);
         }
+    }
+
+    public function required(string $key, string $message)
+    {
+        $this->requires['keys'][] = $key;
+        $this->requires['detail']['message'][$key] = $message;
+
+        return $this->get($key);
+    }
+
+    public function in(string $key, string $message, array $domain)
+    {
+        $this->scopes['keys'][] = $key;
+        $this->scopes['detail']['message'][$key] = $message;
+        $this->scopes['detail']['domain'][$key] = $domain;
+
+        return $this->get($key);
+    }
+
+    public function length(string $key, int $min, string $messageMinimum, int $max = null, string $messageMaximum = null)
+    {
+        $this->lens['keys'][] = $key;
+
+        $this->lens['detail']['min'][$key] = $min;
+        $this->lens['detail']['messageMinimum'][$key] = $messageMinimum;
+
+        if ($max and $messageMaximum) {
+            $this->lens['detail']['max'][$key] = $max;
+            $this->lens['detail']['messageMaximum'][$key] = $messageMaximum;
+        }
+
+        return $this->get($key);
+    }
+
+    private function init()
+    {
+        $this->filterXss($this->input);
     }
 }

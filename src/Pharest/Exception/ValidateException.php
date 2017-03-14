@@ -25,9 +25,8 @@ class ValidateException extends \RuntimeException
 
         foreach ($this->getNotice() as $item) {
             $message[] = [
-                "Message: " => $item->getMessage(),
-                "Field: "   => $item->getField(),
-                "Type: "    => $item->getType(),
+                "field"   => $item->getField(),
+                "message" => $item->getMessage()
             ];
         }
 

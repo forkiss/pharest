@@ -11,6 +11,9 @@ class Application
     /** @var \Phalcon\Di\FactoryDefault $di */
     protected $di;
 
+    /** @var \Phalcon\Mvc\Micro\Collection $finder */
+    protected $finder;
+
     /** @var  string $uri */
     protected $uri;
 
@@ -28,15 +31,15 @@ class Application
 
         $this->debug = $config->application->debug ?? false;
 
-        $finder = new Finder($config->application->route);
-
-        $this->registerDependency($config, $finder);
+        $this->registerDependency($config);
 
         $this->app = new \Phalcon\Mvc\Micro($this->di);
 
         $this->registerMiddleware();
 
-        $this->app->mount($finder->getCollection());
+        $this->finder = new Finder($config->application->route);
+
+        $this->app->mount($this->finder->getCollection());
 
         $this->app->notFound(function () {
             $this->app->response->setStatusCode(404)->sendHeaders();
@@ -73,7 +76,7 @@ class Application
         return [];
     }
 
-    private final function registerDependency(\Pharest\Config &$config, \Pharest\Finder &$finder)
+    private final function registerDependency(\Pharest\Config &$config)
     {
         /**
          * The FactoryDefault Dependency Injector automatically registers the services that
@@ -93,22 +96,16 @@ class Application
 
         $config->method = $this->di->get('request')->getMethod();
 
-        $config->datetime = date('Y-m-d H:i:s');
+        $this->di->setShared('validator', function () use (&$config) {
+            $validator = new \Pharest\Validate\Validator($config);
+
+            return $validator;
+        });
 
         $this->di->setShared('config', function () use (&$config) {
+            $config->datetime = date('Y-m-d H:i:s');
+
             return $config;
         });
-
-        $this->di->setShared('finder', function () use (&$finder) {
-            return $finder;
-        });
-
-        if (in_array($config->method, ['POST', 'PUT'])) {
-            $this->di->setShared('validator', function () {
-                $validator = new \Pharest\Validate\Validator();
-
-                return $validator;
-            });
-        }
     }
 }
