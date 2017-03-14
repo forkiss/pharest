@@ -27,9 +27,9 @@ class Validator extends \Phalcon\Validation
         list($this->requires, $this->scopes, $this->lens) = $config->initValidatorRulers();
     }
 
-    public function get($key)
+    public function get($key, $default = null)
     {
-        return $this->input[$key] ?? null;
+        return $this->input[$key] ?? $default;
     }
 
     public function execute()
@@ -42,7 +42,7 @@ class Validator extends \Phalcon\Validation
 
         $this->notice = $this->validate($this->input);
 
-        if ($this->notice->count()) {
+        if ($this->notice->valid()) {
             $exception = new \Pharest\Exception\ValidateException('表单验证失败');
 
             $exception->setNotice($this->notice);

@@ -19,9 +19,32 @@ class Config extends \Phalcon\Config
     public function initValidatorRulers()
     {
         return [
-            ['keys' => [], 'detail' => ['message' => []]],
-            ['keys' => [], 'detail' => ['message' => [], 'domain' => []]],
-            ['keys' => [], 'detail' => ['min' => [], 'messageMinimum' => [], 'max' => [], 'messageMaximum' => []]]
+            [
+                'keys'   => [],
+                'detail' => [
+                    'message'      => [],
+                    'cancelOnFail' => $this->application->validate->cancel_on_fail
+                ]
+            ],
+            [
+                'keys'   => [],
+                'detail' => [
+                    'message'      => [],
+                    'domain'       => [],
+                    'cancelOnFail' => $this->application->validate->cancel_on_fail
+                ]
+            ],
+            [
+                'keys'   => [],
+                'detail' => [
+                    'min'            => [],
+                    'messageMinimum' => [],
+                    'max'            => [],
+                    'messageMaximum' => [],
+                    'cancelOnFail'   => $this->application->validate->cancel_on_fail
+                ]
+            ]
         ];
     }
+
 }
