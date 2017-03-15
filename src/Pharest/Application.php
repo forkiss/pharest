@@ -17,9 +17,6 @@ class Application
     /** @var  string $uri */
     protected $uri;
 
-    /** @var  bool $debug */
-    public $debug;
-
     /**
      * Handle constructor.
      *
@@ -29,7 +26,7 @@ class Application
     {
         $config = new Config(require_once $path);
 
-        $this->debug = $config->application->debug ?? false;
+        $config->datetime = date('Y-m-d H:i:s');
 
         $this->registerDependency($config);
 
@@ -37,9 +34,7 @@ class Application
 
         $this->registerMiddleware();
 
-        $this->finder = new Finder($config->application->route);
-
-        $this->app->mount($this->finder->getCollection());
+        $this->app->mount((new Finder($config))->getCollection());
 
         $this->app->notFound(function () {
             $this->app->response->setStatusCode(404)->sendHeaders();
@@ -48,7 +43,7 @@ class Application
         });
 
         $this->app->error(function ($exception) {
-            $handler = new ExceptionHandler($this->debug);
+            $handler = new ExceptionHandler();
 
             $handler->handle($this->app->response, $exception);
 
@@ -87,14 +82,14 @@ class Application
         /**
          * include dependencies
          */
-        require_once APP_ROOT . $config->application->dependencies->path;
+        require_once APP_ROOT . '/' . $config->app->dependencies->path;
 
         /**
          * Shared configuration service
          */
-        $config->uri = $this->di->get('request')->getURI();
+        $config->method = $this->di->getShared('request')->getMethod();
 
-        $config->method = $this->di->get('request')->getMethod();
+        $config->uri = $this->di->getShared('request')->getURI();
 
         $this->di->setShared('validator', function () use (&$config) {
             $validator = new \Pharest\Validate\Validator($config);
@@ -103,8 +98,6 @@ class Application
         });
 
         $this->di->setShared('config', function () use (&$config) {
-            $config->datetime = date('Y-m-d H:i:s');
-
             return $config;
         });
     }

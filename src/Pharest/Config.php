@@ -23,7 +23,7 @@ class Config extends \Phalcon\Config
                 'keys'   => [],
                 'detail' => [
                     'message'      => [],
-                    'cancelOnFail' => $this->application->validate->cancel_on_fail
+                    'cancelOnFail' => $this->app->validate->cancel_on_fail
                 ]
             ],
             [
@@ -31,7 +31,7 @@ class Config extends \Phalcon\Config
                 'detail' => [
                     'message'      => [],
                     'domain'       => [],
-                    'cancelOnFail' => $this->application->validate->cancel_on_fail
+                    'cancelOnFail' => $this->app->validate->cancel_on_fail
                 ]
             ],
             [
@@ -41,7 +41,7 @@ class Config extends \Phalcon\Config
                     'messageMinimum' => [],
                     'max'            => [],
                     'messageMaximum' => [],
-                    'cancelOnFail'   => $this->application->validate->cancel_on_fail
+                    'cancelOnFail'   => $this->app->validate->cancel_on_fail
                 ]
             ]
         ];

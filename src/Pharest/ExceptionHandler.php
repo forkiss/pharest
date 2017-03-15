@@ -5,14 +5,6 @@ namespace Pharest;
 
 class ExceptionHandler
 {
-    /** @var bool $debug */
-    protected $debug;
-
-
-    public function __construct($debug = false)
-    {
-        $this->debug = $debug;
-    }
 
     public function handle(\Phalcon\Http\Response &$response, \Exception &$exception)
     {
@@ -21,16 +13,6 @@ class ExceptionHandler
             $handler = new \App\Exception\Handler();
 
             $handler->handle($response, $exception);
-
-        } elseif ($this->debug) {
-
-            $response->setStatusCode($exception->getCode());
-
-            $response->setJsonContent([
-                'message' => $exception->getMessage(),
-                'file'    => $exception->getFile(),
-                'line'    => $exception->getLine()
-            ]);
 
         } else {
 

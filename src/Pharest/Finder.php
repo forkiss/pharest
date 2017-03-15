@@ -17,36 +17,32 @@ class Finder
     /**
      * Finder constructor.
      *
-     * @param \Phalcon\Config $config
+     * @param \Pharest\Config $config
      */
-    public function __construct(\Phalcon\Config $config)
+    public function __construct(\Pharest\Config &$config)
     {
-        if (!isset($_GET['_url'])) {
-            $this->fail();
+        if (!isset($config->uri)) {
+            $this->fail($config->app->finder->fail_header);
         }
 
-        $uri = explode('/', $_GET['_url']);
+        $uri = explode('/', $config->uri);
 
-        if (!isset($uri[1])) {
-            $this->fail();
-        }
-
-        if (isset($config->version) and $config->version) {
+        if (isset($config->app->route->version) and $config->app->route->version) {
             $this->version = $uri[1];
 
             $this->controller = $uri[2] ?? 'index';
 
-            $this->filename = APP_ROOT . $config->path . $this->version . '/' . $this->controller . '.php';
+            $this->filename = $config->app->route->path . $this->version . '/' . $this->controller . '.php';
         } else {
             $this->version = false;
 
             $this->controller = $uri[1] ?? 'index';
 
-            $this->filename = APP_ROOT . $config->path . $this->controller . '.php';
+            $this->filename = $config->app->route->path . $this->controller . '.php';
         }
 
         if (!is_file($this->filename)) {
-            $this->fail();
+            $this->fail($config->app->finder->fail_header);
         }
     }
 
@@ -81,9 +77,9 @@ class Finder
         return ucfirst($this->controller);
     }
 
-    private function fail()
+    private function fail($header)
     {
-        header("HTTP/1.1 404 Not Found");
+        header($header);
         exit;
     }
 
