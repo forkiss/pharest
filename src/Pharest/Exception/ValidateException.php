@@ -7,7 +7,7 @@ class ValidateException extends \RuntimeException
 {
 
     /** @var \Phalcon\Validation\Message\Group $notice */
-    protected $notice;
+    protected $notice = [];
 
     public function setNotice(\Phalcon\Validation\Message\Group $notice)
     {
@@ -19,7 +19,7 @@ class ValidateException extends \RuntimeException
         return $this->notice;
     }
 
-    public function getMessages()
+    public function getFields()
     {
         $message = [];
 

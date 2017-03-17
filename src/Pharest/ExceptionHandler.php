@@ -43,4 +43,5 @@ class ExceptionHandler
 
         return true;
     }
+
 }

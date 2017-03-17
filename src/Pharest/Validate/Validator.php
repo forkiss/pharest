@@ -8,19 +8,27 @@ class Validator extends \Phalcon\Validation
 {
     public $input = [];
 
-    protected $requires;
+    protected $multi;
 
-    protected $scopes;
+    protected $require;
 
-    protected $lens;
+    protected $scope;
+
+    protected $len;
+
+    protected $between;
 
     public function __construct(\Pharest\Config &$config)
     {
-        $this->input = $this->request->get();
+        list($this->require, $this->scope, $this->len) = $config->initValidatorRulers();
 
-        $this->filterXss($this->input);
+        if (in_array($config->method, $config->app->validate->methods->toArray())) {
+            $this->multi = $config->app->validate->multi;
 
-        list($this->requires, $this->scopes, $this->lens) = $config->initValidatorRulers();
+            $this->input = $this->request->get();
+
+            $this->filterXss($this->input);
+        }
     }
 
     public function get($key, $default = null)
@@ -28,18 +36,25 @@ class Validator extends \Phalcon\Validation
         return $this->input[$key] ?? $default;
     }
 
-    public function execute($errorMessage = 'validate fail')
+    public function execute()
     {
-        $this->rule($this->requires['keys'], new Type\PresenceOf($this->requires['detail']));
+        $this->rule($this->require['keys'], new Type\PresenceOf($this->require['detail']));
 
-        $this->rule($this->scopes['keys'], new Type\InclusionIn($this->scopes['detail']));
+        $this->rule($this->scope['keys'], new Type\InclusionIn($this->scope['detail']));
 
-        $this->rule($this->lens['keys'], new Type\StringLength($this->lens['detail']));
+        $this->rule($this->len['keys'], new Type\StringLength($this->len['detail']));
+
+        $this->rule($this->between['keys'], new Type\Between($this->between['detail']));
 
         $notice = $this->validate($this->input);
 
         if ($notice->valid()) {
-            $exception = new \Pharest\Exception\ValidateException($errorMessage);
+
+            if (!$this->multi) {
+                throw new \Pharest\Exception\ValidateException($notice->current()->getMessage());
+            }
+
+            $exception = new \Pharest\Exception\ValidateException('validate fail');
 
             $exception->setNotice($notice);
 
@@ -49,60 +64,80 @@ class Validator extends \Phalcon\Validation
 
     public function presence(string $key, string $message)
     {
-        $this->requires['keys'][] = $key;
-        $this->requires['detail']['message'][$key] = $message;
+        $this->require['keys'][] = $key;
+        $this->require['detail']['message'][$key] = $message;
 
         return $this->get($key);
     }
 
     public function inclusion(string $key, string $message, array $domain)
     {
-        $this->scopes['keys'][] = $key;
-        $this->scopes['detail']['message'][$key] = $message;
-        $this->scopes['detail']['domain'][$key] = $domain;
+        $this->scope['keys'][] = $key;
+        $this->scope['detail']['message'][$key] = $message;
+        $this->scope['detail']['domain'][$key] = $domain;
 
         return $this->get($key);
     }
 
     public function length(string $key, int $min, string $messageMinimum, int $max = null, string $messageMaximum = null)
     {
-        $this->lens['keys'][] = $key;
+        $this->len['keys'][] = $key;
 
-        $this->lens['detail']['min'][$key] = $min;
-        $this->lens['detail']['messageMinimum'][$key] = $messageMinimum;
+        $this->len['detail']['min'][$key] = $min;
+        $this->len['detail']['messageMinimum'][$key] = $messageMinimum;
 
         if ($max and $messageMaximum) {
-            $this->lens['detail']['max'][$key] = $max;
-            $this->lens['detail']['messageMaximum'][$key] = $messageMaximum;
+            $this->len['detail']['max'][$key] = $max;
+            $this->len['detail']['messageMaximum'][$key] = $messageMaximum;
         }
+
+        return $this->get($key);
+    }
+
+    public function between(string $key, float $minimum, float $maximum, string $message)
+    {
+        $this->between['keys'][] = $key;
+
+        $this->between['detail']['minimum'][$key] = $minimum;
+        $this->between['detail']['maximum'][$key] = $maximum;
+        $this->between['detail']['message'][$key] = $message;
 
         return $this->get($key);
     }
 
     public function appendPresence(string $key, string $message)
     {
-        $this->requires['keys'][] = $key;
-        $this->requires['detail']['message'][$key] = $message;
+        $this->require['keys'][] = $key;
+        $this->require['detail']['message'][$key] = $message;
     }
 
     public function appendInclusion(string $key, string $message, array $domain)
     {
-        $this->scopes['keys'][] = $key;
-        $this->scopes['detail']['message'][$key] = $message;
-        $this->scopes['detail']['domain'][$key] = $domain;
+        $this->scope['keys'][] = $key;
+        $this->scope['detail']['message'][$key] = $message;
+        $this->scope['detail']['domain'][$key] = $domain;
     }
 
     public function appendLength(string $key, int $min, string $messageMinimum, int $max = null, string $messageMaximum = null)
     {
-        $this->lens['keys'][] = $key;
+        $this->len['keys'][] = $key;
 
-        $this->lens['detail']['min'][$key] = $min;
-        $this->lens['detail']['messageMinimum'][$key] = $messageMinimum;
+        $this->len['detail']['min'][$key] = $min;
+        $this->len['detail']['messageMinimum'][$key] = $messageMinimum;
 
         if ($max and $messageMaximum) {
-            $this->lens['detail']['max'][$key] = $max;
-            $this->lens['detail']['messageMaximum'][$key] = $messageMaximum;
+            $this->len['detail']['max'][$key] = $max;
+            $this->len['detail']['messageMaximum'][$key] = $messageMaximum;
         }
+    }
+
+    public function appendBetween(string $key, int $minimum, int $max, string $message)
+    {
+        $this->between['keys'][] = $key;
+
+        $this->between['detail']['minimum'][$key] = $minimum;
+        $this->between['detail']['maximum'][$key] = $max;
+        $this->between['detail']['message'][$key] = $message;
     }
 
     private function filterXss(array &$data)

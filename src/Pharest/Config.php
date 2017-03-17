@@ -2,6 +2,7 @@
 
 namespace Pharest;
 
+
 class Config extends \Phalcon\Config
 {
     /** @var string $platform */
@@ -23,7 +24,7 @@ class Config extends \Phalcon\Config
                 'keys'   => [],
                 'detail' => [
                     'message'      => [],
-                    'cancelOnFail' => $this->app->validate->cancel_on_fail
+                    'cancelOnFail' => !$this->app->validate->multi
                 ]
             ],
             [
@@ -31,7 +32,7 @@ class Config extends \Phalcon\Config
                 'detail' => [
                     'message'      => [],
                     'domain'       => [],
-                    'cancelOnFail' => $this->app->validate->cancel_on_fail
+                    'cancelOnFail' => !$this->app->validate->multi
                 ]
             ],
             [
@@ -41,7 +42,16 @@ class Config extends \Phalcon\Config
                     'messageMinimum' => [],
                     'max'            => [],
                     'messageMaximum' => [],
-                    'cancelOnFail'   => $this->app->validate->cancel_on_fail
+                    'cancelOnFail'   => !$this->app->validate->multi
+                ]
+            ],
+            [
+                'keys'   => [],
+                'detail' => [
+                    'minimum'      => [],
+                    'maximum'      => [],
+                    'message'      => [],
+                    'cancelOnFail' => !$this->app->validate->multi
                 ]
             ]
         ];
