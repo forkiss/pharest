@@ -18,17 +18,15 @@ class Validator extends \Phalcon\Validation
 
     protected $between;
 
-    public function __construct(\Pharest\Config &$config)
+    public function __construct(bool &$multi)
     {
-        list($this->require, $this->scope, $this->len) = $config->initValidatorRulers();
+        $this->multi = $multi;
 
-        if (in_array($config->method, $config->app->validate->methods->toArray())) {
-            $this->multi = $config->app->validate->multi;
+        $this->require = $this->scope = $this->len = $this->between = ['keys' => [], 'detail' => ['cancelOnFail' => !$multi]];
 
-            $this->input = $this->request->get();
+        $this->input = $this->request->get();
 
-            $this->filterXss($this->input);
-        }
+        $this->filterXss($this->input);
     }
 
     public function get($key, $default = null)
@@ -54,7 +52,7 @@ class Validator extends \Phalcon\Validation
                 throw new \Pharest\Exception\ValidateException($notice->current()->getMessage());
             }
 
-            $exception = new \Pharest\Exception\ValidateException('validate fail');
+            $exception = new \Pharest\Exception\ValidateException('params invalid');
 
             $exception->setNotice($notice);
 
@@ -153,4 +151,5 @@ class Validator extends \Phalcon\Validation
             $data[$key] = preg_replace(['/[on][a-zA-Z]+(\s*)=(\s*)?[\'"]?[^\'"]+[\'"&gt;]?/i', '/>/'], '', $data[$key]);
         }
     }
+
 }

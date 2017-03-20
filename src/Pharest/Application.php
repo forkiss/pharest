@@ -91,11 +91,17 @@ class Application
 
         $config->uri = $this->di->getShared('request')->getURI();
 
-        $this->di->setShared('validator', function () use (&$config) {
-            $validator = new \Pharest\Validate\Validator($config);
+        if (in_array($config->method, $config->app->validate->methods->toArray())) {
 
-            return $validator;
-        });
+            $multi = $config->app->validate->multi;
+
+            $this->di->setShared('validator', function () use(&$multi) {
+                $validator = new \Pharest\Validate\Validator($multi);
+
+                return $validator;
+            });
+
+        }
 
         $this->di->setShared('config', function () use (&$config) {
             return $config;
