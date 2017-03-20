@@ -68,7 +68,7 @@ class Validator extends \Phalcon\Validation
         return $this->get($key);
     }
 
-    public function inclusion(string $key, string $message, array $domain)
+    public function inclusion(string $key, array $domain, string $message)
     {
         $this->scope['keys'][] = $key;
         $this->scope['detail']['message'][$key] = $message;
@@ -109,7 +109,7 @@ class Validator extends \Phalcon\Validation
         $this->require['detail']['message'][$key] = $message;
     }
 
-    public function appendInclusion(string $key, string $message, array $domain)
+    public function appendInclusion(string $key, array $domain, string $message)
     {
         $this->scope['keys'][] = $key;
         $this->scope['detail']['message'][$key] = $message;
