@@ -19,12 +19,10 @@ class Application
 
     /**
      * Handle constructor.
-     *
-     * @param string $path
      */
-    public function __construct(string $path)
+    public function __construct()
     {
-        $config = new Config(require_once $path);
+        $config = new Config(require_once APP_ROOT . '/app/config/config.php');
 
         $config->datetime = date('Y-m-d H:i:s');
 
@@ -82,17 +80,16 @@ class Application
         /**
          * include dependencies
          */
-        require_once APP_ROOT . '/' . $config->app->dependencies->path;
+        require_once APP_ROOT . '/app/config/dependencies.php';
 
-        /**
-         * Shared configuration service
-         */
         $config->method = $this->di->getShared('request')->getMethod();
 
         $config->uri = $this->di->getShared('request')->getURI();
 
+        /**
+         * Shared validator service
+         */
         if (in_array($config->method, $config->app->validate->methods->toArray())) {
-
             $multi = $config->app->validate->multi;
 
             $this->di->setShared('validator', function () use(&$multi) {
@@ -100,9 +97,11 @@ class Application
 
                 return $validator;
             });
-
         }
 
+        /**
+         * Shared configuration service
+         */
         $this->di->setShared('config', function () use (&$config) {
             return $config;
         });

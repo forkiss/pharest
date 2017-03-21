@@ -32,13 +32,13 @@ class Finder
 
             $this->controller = $uri[2] ?? 'index';
 
-            $this->filename = $config->app->route->path . $this->version . '/' . $this->controller . '.php';
+            $this->filename = APP_ROOT . $config->app->route->path . $this->version . '/' . $this->controller . '.php';
         } else {
             $this->version = false;
 
             $this->controller = $uri[1] ?? 'index';
 
-            $this->filename = $config->app->route->path . $this->controller . '.php';
+            $this->filename = APP_ROOT . $config->app->route->path . $this->controller . '.php';
         }
 
         if (!is_file($this->filename)) {
