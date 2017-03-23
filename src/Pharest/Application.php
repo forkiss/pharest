@@ -57,16 +57,15 @@ class Application
     private final function registerMiddleware()
     {
         if (class_exists(\App\Middleware\Kernel::class)) {
-            $middleware = (new \App\Middleware\Kernel())->middleware;
+            $kernel = new \App\Middleware\Kernel();
 
-            foreach ($middleware as $class => $action) {
-                $this->app->{$action}(new $class());
+            foreach ($kernel->middleware as $middleware) {
+                (new $middleware())->call($this->app);
             }
 
-            return $middleware;
         }
 
-        return [];
+        return true;
     }
 
     private final function registerDependency(\Pharest\Config &$config)
@@ -77,14 +76,14 @@ class Application
          */
         $this->di = new \Phalcon\Di\FactoryDefault();
 
+        $config->method = $this->di->getShared('request')->getMethod();
+
+        $config->uri = $this->di->getShared('request')->getURI();
+
         /**
          * include dependencies
          */
         require_once APP_ROOT . '/app/config/dependencies.php';
-
-        $config->method = $this->di->getShared('request')->getMethod();
-
-        $config->uri = $this->di->getShared('request')->getURI();
 
         /**
          * Shared validator service
