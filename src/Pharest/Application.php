@@ -26,11 +26,13 @@ class Application
 
         $config->datetime = date('Y-m-d H:i:s');
 
-        $this->registerDependency($config);
+        $register = new \Pharest\Register\Register();
 
-        $this->app = new \Phalcon\Mvc\Micro($this->di);
+        $this->app = new \Phalcon\Mvc\Micro($register->injector($config));
 
-        $this->registerMiddleware();
+        if (class_exists(\App\Middleware\Kernel::class)) {
+            $register->middleware($this->app);
+        }
 
         $this->app->mount((new Finder($config))->getCollection());
 
@@ -54,55 +56,4 @@ class Application
         $this->app->handle();
     }
 
-    private final function registerMiddleware()
-    {
-        if (class_exists(\App\Middleware\Kernel::class)) {
-            $kernel = new \App\Middleware\Kernel();
-
-            foreach ($kernel->middleware as $middleware) {
-                (new $middleware())->call($this->app);
-            }
-
-        }
-
-        return true;
-    }
-
-    private final function registerDependency(\Pharest\Config &$config)
-    {
-        /**
-         * The FactoryDefault Dependency Injector automatically registers the services that
-         * provide a full stack framework. These default services can be overidden with custom ones.
-         */
-        $this->di = new \Phalcon\Di\FactoryDefault();
-
-        $config->method = $this->di->getShared('request')->getMethod();
-
-        $config->uri = $this->di->getShared('request')->getURI();
-
-        /**
-         * include dependencies
-         */
-        require_once APP_ROOT . '/app/config/dependencies.php';
-
-        /**
-         * Shared validator service
-         */
-        if (in_array($config->method, $config->app->validate->methods->toArray())) {
-            $multi = $config->app->validate->multi;
-
-            $this->di->setShared('validator', function () use(&$multi) {
-                $validator = new \Pharest\Validate\Validator($multi);
-
-                return $validator;
-            });
-        }
-
-        /**
-         * Shared configuration service
-         */
-        $this->di->setShared('config', function () use (&$config) {
-            return $config;
-        });
-    }
 }

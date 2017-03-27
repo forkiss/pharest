@@ -2,7 +2,6 @@
 
 namespace Pharest;
 
-
 class Config extends \Phalcon\Config
 {
     /** @var string $platform */
@@ -11,10 +10,14 @@ class Config extends \Phalcon\Config
     /** @var \DateTime $datetime */
     public $datetime;
 
-    /** @var string $fresh */
-    public $uri;
+    /** @var array $request */
+    public $request = [];
 
-    /** @var string $method */
-    public $method;
+    public function setRequest($method, $uri)
+    {
+        $this->request['method'] = $method;
+
+        $this->request['url'] = $uri;
+    }
 
 }

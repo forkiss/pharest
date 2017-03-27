@@ -21,11 +21,11 @@ class Finder
      */
     public function __construct(\Pharest\Config &$config)
     {
-        if (!isset($config->uri)) {
+        if (!isset($config->request['url'])) {
             $this->fail($config->app->finder->fail_header);
         }
 
-        $uri = explode('/', $config->uri);
+        $uri = explode('/', $config->request['url']);
 
         if (isset($config->app->route->version) and $config->app->route->version) {
             $this->version = $uri[1];
