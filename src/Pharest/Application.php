@@ -22,19 +22,13 @@ class Application
      */
     public function __construct()
     {
-        $config = new Config(require_once APP_ROOT . '/app/config/config.php');
-
-        $config->datetime = date('Y-m-d H:i:s');
-
         $register = new \Pharest\Register\Register();
 
-        $this->app = new \Phalcon\Mvc\Micro($register->injector($config));
+        $this->app = new \Phalcon\Mvc\Micro($register->injector());
 
-        if (class_exists(\App\Middleware\Kernel::class)) {
-            $register->middleware($this->app);
-        }
+        $register->middleware($this->app);
 
-        $this->app->mount((new Finder($config))->getCollection());
+        $this->app->mount($register->router());
 
         $this->app->notFound(function () {
             $this->app->response->setStatusCode(404)->sendHeaders();

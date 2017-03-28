@@ -138,7 +138,7 @@ class Validator extends \Phalcon\Validation
         $this->between['detail']['message'][$key] = $message;
     }
 
-    private function filterXss(array &$data)
+    public function filterXss(array &$data)
     {
         foreach ($data as $key => $value) {
 
@@ -150,6 +150,13 @@ class Validator extends \Phalcon\Validation
 
             $data[$key] = preg_replace(['/[on][a-zA-Z]+(\s*)=(\s*)?[\'"]?[^\'"]+[\'"&gt;]?/i', '/>/'], '', $data[$key]);
         }
+    }
+
+    public function filterSecurityString($string, $len = 45)
+    {
+        $string = mb_substr($string, 0, $len, 'UTF-8');
+
+        return str_replace(["\r", "\r\n", "\n", "\t", '"', "'", " ", "&nbsp;", "\v", "\xe2\x80\xa8", "&nbs", ' '], ['', '', '', '', '“', '‘', " ", '', '', '', '', ''], $string);
     }
 
 }

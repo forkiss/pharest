@@ -10,14 +10,10 @@ class Config extends \Phalcon\Config
     /** @var \DateTime $datetime */
     public $datetime;
 
-    /** @var array $request */
-    public $request = [];
+    /** @var string $request */
+    public $method;
 
-    public function setRequest($method, $uri)
-    {
-        $this->request['method'] = $method;
-
-        $this->request['url'] = $uri;
-    }
+    /** @var string $request */
+    public $uri;
 
 }
