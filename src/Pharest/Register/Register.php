@@ -126,15 +126,16 @@ class Register
                 mkdir($path, 0777, true);
             }
 
-            $message = json_encode([
-                'time'    => $this->config->time[1],
+            $file = $path . '/error-log-' . $this->config->time[0] . '.txt';
+
+            $message = $this->config->time[1] . ' - ' . json_encode([
                 'type'    => $_error['type'],
-                'message' => $_error['message'],
+                'message' => explode("\nStack trace:\n", $_error['message'])[0],
                 'file'    => str_replace(APP_ROOT, '', $_error['file']),
                 'line'    => $_error['line']
-            ]);
+            ]) . "\n";
 
-            file_put_contents($path . '/error-log-' . $this->config->time[0] . '.txt', $message . "\n", FILE_APPEND);
+            file_put_contents($file, $message, FILE_APPEND);
         }
 
         exit;
@@ -145,4 +146,5 @@ class Register
         header($header);
         exit;
     }
+
 }
