@@ -15,11 +15,15 @@ class Validator extends \Phalcon\Validation
 
     protected $between;
 
+    protected $multi;
+
     public $input = [];
 
     public function __construct(\Pharest\Config &$config)
     {
         $this->input = $this->request->get();
+
+        $this->multi = $config->app->validate->multi;
 
         if ($config->app->validate->filter->get($config->method)) {
             $this->filterXss($this->input);
@@ -28,7 +32,7 @@ class Validator extends \Phalcon\Validation
         $this->require = $this->scope = $this->len = $this->between = [
             'keys'   => [],
             'detail' => [
-                'cancelOnFail' => !$config->app->validate->multi,
+                'cancelOnFail' => !$this->multi,
                 'allowEmpty'   => $config->app->validate->get('allow_empty_types', [])
             ]
         ];
