@@ -6,9 +6,6 @@ use \Phalcon\Validation\Validator as Type;
 
 class Validator extends \Phalcon\Validation
 {
-    public $input = [];
-
-    protected $multi;
 
     protected $require;
 
@@ -18,15 +15,23 @@ class Validator extends \Phalcon\Validation
 
     protected $between;
 
-    public function __construct(bool &$multi)
+    public $input = [];
+
+    public function __construct(\Pharest\Config &$config)
     {
-        $this->multi = $multi;
-
-        $this->require = $this->scope = $this->len = $this->between = ['keys' => [], 'detail' => ['cancelOnFail' => !$multi]];
-
         $this->input = $this->request->get();
 
-        $this->filterXss($this->input);
+        if ($config->app->validate->filter->get($config->method)) {
+            $this->filterXss($this->input);
+        }
+
+        $this->require = $this->scope = $this->len = $this->between = [
+            'keys'   => [],
+            'detail' => [
+                'cancelOnFail' => !$config->app->validate->multi,
+                'allowEmpty'   => $config->app->validate->get('allow_empty_types', [])
+            ]
+        ];
     }
 
     public function get($key, $default = null)
@@ -136,6 +141,11 @@ class Validator extends \Phalcon\Validation
         $this->between['detail']['minimum'][$key] = $minimum;
         $this->between['detail']['maximum'][$key] = $max;
         $this->between['detail']['message'][$key] = $message;
+    }
+
+    public function setAllowEmpty(array $allows)
+    {
+        $this->empty = $allows;
     }
 
     public function filterXss(array &$data)

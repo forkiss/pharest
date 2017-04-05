@@ -40,10 +40,8 @@ class Register
             /**
              * Shared validator service
              */
-            $multi = $config->app->validate->multi;
-
-            $di->setShared('validator', function () use (&$multi) {
-                $validator = new \Pharest\Validate\Validator($multi);
+            $di->setShared('validator', function () use (&$config) {
+                $validator = new \Pharest\Validate\Validator($config);
 
                 return $validator;
             });
