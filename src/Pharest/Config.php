@@ -2,6 +2,7 @@
 
 namespace Pharest;
 
+
 class Config extends \Phalcon\Config
 {
     /** @var string $platform */

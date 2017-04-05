@@ -143,11 +143,6 @@ class Validator extends \Phalcon\Validation
         $this->between['detail']['message'][$key] = $message;
     }
 
-    public function setAllowEmpty(array $allows)
-    {
-        $this->empty = $allows;
-    }
-
     public function filterXss(array &$data)
     {
         foreach ($data as $key => $value) {

@@ -36,7 +36,7 @@ class Register
          */
         require_once APP_ROOT . $config->app->dependencies->path;
 
-        if ($config->app->validate->methods->get($config->method)) {
+        if ($config->app->validate->methods->get($config->method, false)) {
             /**
              * Shared validator service
              */
