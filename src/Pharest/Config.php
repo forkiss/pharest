@@ -8,6 +8,9 @@ class Config extends \Phalcon\Config
     /** @var string $platform */
     public $platform;
 
+    /** @var array $time */
+    public $time;
+
     /** @var \DateTime $datetime */
     public $datetime;
 

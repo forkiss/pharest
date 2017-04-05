@@ -20,6 +20,8 @@ class Register
 
         $config->datetime = date('Y-m-d H:i:s');
 
+        $config->time = explode(' ', $config->datetime);
+
         $config->method = $di->getShared('request')->getMethod();
 
         $config->uri = $di->getShared('request')->getURI();
@@ -50,6 +52,8 @@ class Register
         $this->config = $config;
 
         unset($config);
+
+        register_shutdown_function([$this, 'logger']);
 
         return $di;
     }
@@ -87,7 +91,7 @@ class Register
 
             $file = APP_ROOT . $this->config->app->route->path . $uri[1] . '/' . $controller . '.php';
 
-            $prefix  = '/' . $uri[1] . '/' . $controller;
+            $prefix = '/' . $uri[1] . '/' . $controller;
         } else {
             $controller = $uri[1] ?? 'index';
 
@@ -109,6 +113,31 @@ class Register
         unset($uri, $controller, $file, $prefix);
 
         return $router;
+    }
+
+    public function logger()
+    {
+        $_error = error_get_last();
+
+        if (!empty($_error) and in_array($_error['type'], [1, 4, 16, 64, 256, 4096, E_ALL])) {
+            $path = APP_ROOT . '/storage/logs/app';
+
+            if (!is_dir($path)) {
+                mkdir($path, 0777, true);
+            }
+
+            $message = json_encode([
+                'time'    => $this->config->time[1],
+                'type'    => $_error['type'],
+                'message' => $_error['message'],
+                'file'    => str_replace(APP_ROOT, '', $_error['file']),
+                'line'    => $_error['line']
+            ]);
+
+            file_put_contents($path . '/error-log-' . $this->config->time[0] . '.txt', $message . "\n", FILE_APPEND);
+        }
+
+        exit;
     }
 
     private function fail($header)
