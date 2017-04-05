@@ -21,7 +21,7 @@ class Validator extends \Phalcon\Validation
 
     public function __construct(\Pharest\Config &$config)
     {
-        $this->input = $this->request->get();
+        $this->input = $this->request->getJsonRawBody(true);
 
         $this->multi = $config->app->validate->multi;
 
