@@ -25,16 +25,13 @@ class Validator extends \Phalcon\Validation
 
         $this->multi = $config->app->validate->multi;
 
-        if ($config->app->validate->filter->get($config->method)) {
+        if (!empty($this->input) and $config->app->validate->filter->get($config->method)) {
             $this->filterXss($this->input);
         }
 
-        $this->require = $this->scope = $this->len = $this->between = [
+        $this->require = $this->scope = $this->between = $this->len = [
             'keys'   => [],
-            'detail' => [
-                'cancelOnFail' => !$this->multi,
-                'allowEmpty'   => $config->app->validate->get('allow_empty_types', [])
-            ]
+            'detail' => ['cancelOnFail' => !$this->multi]
         ];
     }
 
