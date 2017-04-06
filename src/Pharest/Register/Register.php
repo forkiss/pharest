@@ -51,9 +51,9 @@ class Register
 
         $this->config = $config;
 
-        unset($config);
+        register_shutdown_function([new Logger($config), 'error']);
 
-        register_shutdown_function([$this, 'logger']);
+        unset($config);
 
         return $di;
     }
@@ -80,71 +80,9 @@ class Register
 
     public function router()
     {
-        $uri = explode('/', $this->config->uri);
+        $router = new Router();
 
-        if (!isset($uri[1]) or !$uri[1]) {
-            $this->fail($this->config->app->finder->fail_header);
-        }
-
-        if ($this->config->app->route->version) {
-            $controller = $uri[2] ?? 'index';
-
-            $file = APP_ROOT . $this->config->app->route->path . $uri[1] . '/' . $controller . '.php';
-
-            $prefix = '/' . $uri[1] . '/' . $controller;
-        } else {
-            $controller = $uri[1] ?? 'index';
-
-            $file = APP_ROOT . $this->config->app->route->path . $controller . '.php';
-
-            $prefix = '/' . $controller;
-        }
-
-        if (!is_file($file)) {
-            $this->fail($this->config->app->finder->fail_header);
-        }
-
-        $router = new \Phalcon\Mvc\Micro\Collection();
-
-        $router->setPrefix($prefix);
-
-        require_once $file;
-
-        unset($uri, $controller, $file, $prefix);
-
-        return $router;
-    }
-
-    public function logger()
-    {
-        $_error = error_get_last();
-
-        if (!empty($_error) and in_array($_error['type'], [1, 4, 16, 64, 256, 4096, E_ALL])) {
-            $path = APP_ROOT . '/storage/logs/app';
-
-            if (!is_dir($path)) {
-                mkdir($path, 0777, true);
-            }
-
-            $file = $path . '/error-log-' . $this->config->time[0] . '.txt';
-
-            $message = $this->config->time[1] . ' - ' . json_encode([
-                'type'    => $_error['type'],
-                'message' => explode("\nStack trace:\n", $_error['message'])[0],
-                'file'    => str_replace(APP_ROOT, '', $_error['file']),
-                'line'    => $_error['line']
-            ]) . "\n";
-
-            file_put_contents($file, $message, FILE_APPEND);
-        }
-
-        exit;
-    }
-
-    private function fail($header)
-    {
-        header($header);
-        exit;
+        return $router->collection($this->config);
     }
 
 }
