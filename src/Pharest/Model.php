@@ -30,6 +30,7 @@ abstract class Model extends \Phalcon\Mvc\Model
 
     /**
      * Allows to query the first record that match the specified conditions
+     *
      * @param mixed  $parameters
      * @param string $message
      *
@@ -48,6 +49,13 @@ abstract class Model extends \Phalcon\Mvc\Model
         }
 
         return $query;
+    }
+
+    public function save($data = null, $whiteList = null)
+    {
+        if (parent::save($data, $whiteList) === false) {
+            throw new \Pharest\Exception\ModelException('server busy', 100090);
+        }
     }
 
 }
