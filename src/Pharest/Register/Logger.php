@@ -34,6 +34,8 @@ class Logger
         $_error = error_get_last();
 
         if (!empty($_error) and in_array($_error['type'], [1, 4, 16, 64, 256, 4096, E_ALL])) {
+
+
             $path = APP_ROOT . $this->path . 'error/';
 
             if (!is_dir($path)) {

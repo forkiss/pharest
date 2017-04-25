@@ -58,4 +58,11 @@ abstract class Model extends \Phalcon\Mvc\Model
         }
     }
 
+    public function update($data = null, $whiteList = null)
+    {
+        if (parent::update($data, $whiteList) === false) {
+            throw new \Pharest\Exception\ModelException('server busy', 100090);
+        }
+    }
+
 }
