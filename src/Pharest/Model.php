@@ -41,11 +41,12 @@ abstract class Model extends \Phalcon\Mvc\Model
         $query = parent::findFirst($parameters);
 
         if (!$query) {
+            
             if (!$message) {
                 $message = self::getSchema() . ' data can not be found';
             }
 
-            throw new \Pharest\Exception\NotFoundException($message);
+            throw new \Pharest\Exception\ModelException($message, 100091);
         }
 
         return $query;
@@ -54,14 +55,14 @@ abstract class Model extends \Phalcon\Mvc\Model
     public function save($data = null, $whiteList = null)
     {
         if (parent::save($data, $whiteList) === false) {
-            throw new \Pharest\Exception\ModelException('server busy', 100090);
+            throw new \Pharest\Exception\ModelException(implode(',', $this->getMessages()), 100090);
         }
     }
 
     public function update($data = null, $whiteList = null)
     {
         if (parent::update($data, $whiteList) === false) {
-            throw new \Pharest\Exception\ModelException('server busy', 100090);
+            throw new \Pharest\Exception\ModelException(implode(',', $this->getMessages()), 100090);
         }
     }
 
