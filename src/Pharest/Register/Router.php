@@ -4,8 +4,6 @@ namespace Pharest\Register;
 
 class Router
 {
-    protected $router;
-
     protected $parser;
 
     protected $status;
@@ -20,9 +18,24 @@ class Router
 
         $this->parser($config->uri, APP_ROOT . $config->app->route->path, $config->app->route->version);
 
-        $this->make();
+        return $this->make();
+    }
 
-        return $this->router;
+    private function make()
+    {
+        $router = new \Phalcon\Mvc\Micro\Collection();
+
+        $router->setPrefix($this->prefix);
+
+        require_once $this->file;
+
+        return $router;
+    }
+
+    private function fail()
+    {
+        header($this->status);
+        exit;
     }
 
     private function parser($url, $path, $version)
@@ -34,7 +47,15 @@ class Router
         }
 
         if ($version) {
-            $controller = $uri[2] ?? 'index';
+            if (isset($uri[2])) {
+                if (strpos($uri[2], '?') !== false) {
+                    $controller = explode('?', $uri[2])[0];
+                } else {
+                    $controller = $uri[2];
+                }
+            } else {
+                $controller = 'index';
+            }
 
             $this->file = $path . $uri[1] . '/' . $controller . '.php';
 
@@ -50,25 +71,6 @@ class Router
         if (!is_file($this->file)) {
             $this->fail();
         }
-    }
-
-    private function make()
-    {
-        $router = new \Phalcon\Mvc\Micro\Collection();
-
-        $router->setPrefix($this->prefix);
-
-        require_once $this->file;
-
-        $this->router = $router;
-
-        unset($router);
-    }
-
-    private function fail()
-    {
-        header($this->status);
-        exit;
     }
 
 }
