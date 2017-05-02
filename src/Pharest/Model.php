@@ -3,7 +3,7 @@
 namespace Pharest;
 
 
-abstract class Model extends \Phalcon\Mvc\Model
+class Model extends \Phalcon\Mvc\Model
 {
     /**
      * Allows to query a set of records that match the specified conditions
@@ -52,16 +52,9 @@ abstract class Model extends \Phalcon\Mvc\Model
         return $query;
     }
 
-    public function save($data = null, $whiteList = null)
+    public function store($data = NULL)
     {
-        if (parent::save($data, $whiteList) === false) {
-            throw new \Pharest\Exception\ModelException(implode(',', $this->getMessages()), 100090);
-        }
-    }
-
-    public function update($data = null, $whiteList = null)
-    {
-        if (parent::update($data, $whiteList) === false) {
+        if (parent::save($data) === false) {
             throw new \Pharest\Exception\ModelException(implode(',', $this->getMessages()), 100090);
         }
     }

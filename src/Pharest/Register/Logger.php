@@ -35,7 +35,6 @@ class Logger
 
         if (!empty($_error) and in_array($_error['type'], [1, 4, 16, 64, 256, 4096, E_ALL])) {
 
-
             $path = APP_ROOT . $this->path . 'error/';
 
             if (!is_dir($path)) {
@@ -46,7 +45,7 @@ class Logger
 
             $message = $this->time . ' - ' . json_encode([
                     'type'    => $_error['type'],
-                    'message' => substr($_error['message'], 0, strpos($_error['message'], "\nStack trace")),
+                    'message' => strpos($_error['message'], "\nStack trace") === false ? $_error['message'] : substr($_error['message'], 0, strpos($_error['message'], "\nStack trace")),
                     'file'    => str_replace(APP_ROOT, '', $_error['file']),
                     'line'    => $_error['line']
                 ], JSON_UNESCAPED_SLASHES) . "\n";

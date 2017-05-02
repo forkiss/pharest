@@ -9,7 +9,7 @@ namespace Pharest;
  *
  * @property \Pharest\Config config
  */
-abstract class Controller extends \Phalcon\Di\Injectable implements \Phalcon\Mvc\ControllerInterface
+class Controller extends \Phalcon\Di\Injectable implements \Phalcon\Mvc\ControllerInterface
 {
     /**
      * Phalcon\Mvc\Controller constructor

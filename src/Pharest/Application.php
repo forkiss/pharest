@@ -31,7 +31,7 @@ class Application
         $this->app->mount($register->router());
 
         $this->app->notFound(function () {
-            $this->app->response->setStatusCode(404)->sendHeaders();
+            $this->app->response->setStatusCode(404, 'Not Found')->sendHeaders();
 
             return $this->app->response;
         });
