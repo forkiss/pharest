@@ -68,43 +68,28 @@ class Validator extends \Phalcon\Validation
 
     public function presence(string $key, string $message)
     {
-        $this->require['keys'][] = $key;
-        $this->require['detail']['message'][$key] = $message;
+        $this->appendPresence($key, $message);
 
         return $this->get($key);
     }
 
     public function inclusion(string $key, array $domain, string $message)
     {
-        $this->scope['keys'][] = $key;
-        $this->scope['detail']['message'][$key] = $message;
-        $this->scope['detail']['domain'][$key] = $domain;
+        $this->appendInclusion($key, $domain, $message);
 
         return $this->get($key);
     }
 
     public function length(string $key, int $min, string $messageMinimum, int $max = null, string $messageMaximum = null)
     {
-        $this->len['keys'][] = $key;
-
-        $this->len['detail']['min'][$key] = $min;
-        $this->len['detail']['messageMinimum'][$key] = $messageMinimum;
-
-        if ($max and $messageMaximum) {
-            $this->len['detail']['max'][$key] = $max;
-            $this->len['detail']['messageMaximum'][$key] = $messageMaximum;
-        }
+        $this->appendLength($key, $min, $messageMinimum, $max, $messageMaximum);
 
         return $this->get($key);
     }
 
     public function between(string $key, float $minimum, float $maximum, string $message)
     {
-        $this->between['keys'][] = $key;
-
-        $this->between['detail']['minimum'][$key] = $minimum;
-        $this->between['detail']['maximum'][$key] = $maximum;
-        $this->between['detail']['message'][$key] = $message;
+        $this->appendBetween($key, $minimum, $maximum, $message);
 
         return $this->get($key);
     }
@@ -135,12 +120,12 @@ class Validator extends \Phalcon\Validation
         }
     }
 
-    public function appendBetween(string $key, int $minimum, int $max, string $message)
+    public function appendBetween(string $key, float $minimum, float $maximum, string $message)
     {
         $this->between['keys'][] = $key;
 
         $this->between['detail']['minimum'][$key] = $minimum;
-        $this->between['detail']['maximum'][$key] = $max;
+        $this->between['detail']['maximum'][$key] = $maximum;
         $this->between['detail']['message'][$key] = $message;
     }
 

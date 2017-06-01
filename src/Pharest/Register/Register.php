@@ -59,26 +59,6 @@ class Register
         return $di;
     }
 
-    public function middleware(\Phalcon\Mvc\Micro &$app)
-    {
-        if (!class_exists(\App\Middleware\Kernel::class)) {
-            return false;
-        }
-
-        $kernel = new \App\Middleware\Kernel();
-
-        /** @var \Pharest\Middleware\Immediately $middleware */
-        foreach ($kernel->middleware as $middleware) {
-            $middleware = new $middleware();
-
-            $middleware->call($app);
-        }
-
-        unset($kernel, $middleware);
-
-        return true;
-    }
-
     public function router()
     {
         $router = new Router();

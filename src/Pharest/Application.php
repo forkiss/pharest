@@ -26,7 +26,7 @@ class Application
 
         $this->app = new \Phalcon\Mvc\Micro($register->injector());
 
-        $register->middleware($this->app);
+        $this->middleware();
 
         $this->app->mount($register->router());
 
@@ -48,6 +48,26 @@ class Application
     public function run()
     {
         $this->app->handle();
+    }
+
+    public function middleware()
+    {
+        if (!class_exists(\App\Middleware\Kernel::class)) {
+            return false;
+        }
+
+        $kernel = new \App\Middleware\Kernel();
+
+        /** @var \Pharest\Middleware\Immediately $middleware */
+        foreach ($kernel->middleware as $middleware) {
+            $middleware = new $middleware();
+
+            $middleware->call($this->app);
+        }
+
+        unset($kernel, $middleware);
+
+        return true;
     }
 
 }
