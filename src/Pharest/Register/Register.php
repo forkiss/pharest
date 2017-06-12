@@ -21,8 +21,6 @@ class Register
 
         $config->datetime = date('Y-m-d H:i:s');
 
-        $config->time = explode(' ', $config->datetime);
-
         $config->method = $di->getShared('request')->getMethod();
 
         $config->uri = $di->getShared('request')->getURI();
@@ -51,8 +49,6 @@ class Register
         }
 
         $this->config = $config;
-
-        register_shutdown_function([new Logger($config), 'error']);
 
         unset($config);
 

@@ -37,7 +37,7 @@ class Application
         });
 
         $this->app->error(function ($exception) {
-            $handler = new Exception();
+            $handler = new \App\Exception\Handler();
 
             $handler->handle($this->app->response, $exception);
 

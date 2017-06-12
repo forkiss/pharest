@@ -20,9 +20,9 @@ class Logger
     {
         $this->path = $config->app->get('log');
 
-        $this->date = $config->time[0];
+        $this->date = date('Y-m-d');
 
-        $this->time = $config->time[1];
+        $this->time = date('H:i:s');
     }
 
     public function error()

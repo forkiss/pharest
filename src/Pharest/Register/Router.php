@@ -16,7 +16,7 @@ class Router
     {
         $this->status = $config->app->finder->fail_header;
 
-        $this->parser($config->uri, APP_ROOT . $config->app->route->path, $config->app->route->version);
+        $this->parser($config->uri, $config->app->route->path, $config->app->route->version);
 
         return $this->make();
     }
@@ -57,13 +57,13 @@ class Router
                 $controller = 'index';
             }
 
-            $this->file = $path . $uri[1] . '/' . $controller . '.php';
+            $this->file = APP_ROOT . $path . $uri[1] . '/' . $controller . '.php';
 
             $this->prefix = '/' . $uri[1] . '/' . $controller;
         } else {
             $controller = $uri[1] ?? 'index';
 
-            $this->file = $path . $controller . '.php';
+            $this->file = APP_ROOT . $path . $controller . '.php';
 
             $this->prefix = '/' . $controller;
         }
