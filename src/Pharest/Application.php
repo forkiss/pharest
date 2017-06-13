@@ -28,7 +28,7 @@ class Application
 
         $this->middleware();
 
-        $this->app->mount($register->router());
+        $this->app->mount($this->app->finder->make());
 
         $this->app->notFound(function () {
             $this->app->response->setStatusCode(404, 'Not Found')->sendHeaders();

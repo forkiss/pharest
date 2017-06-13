@@ -21,11 +21,15 @@ class Validator extends \Phalcon\Validation
 
     public function __construct(\Pharest\Config &$config)
     {
-        $this->input = $this->request->getJsonRawBody(true);
+        if ($config->app->validate->accept === 'application/json') {
+            $this->input = $this->request->getJsonRawBody(true);
+        } else {
+            $this->input = $this->request->get();
+        }
 
         $this->multi = $config->app->validate->multi;
 
-        if (!empty($this->input) and $config->app->validate->filter->get($config->method)) {
+        if ($config->app->validate->filter->get($config->method, false) and !empty($this->input)) {
             $this->filterXss($this->input);
         }
 
@@ -143,7 +147,7 @@ class Validator extends \Phalcon\Validation
         }
     }
 
-    public function filterSecurityString($string, $len = 45)
+    public function filterSecurityString($string, $len = 50)
     {
         $string = mb_substr($string, 0, $len, 'UTF-8');
 

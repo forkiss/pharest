@@ -4,8 +4,6 @@ namespace Pharest\Register;
 
 class Register
 {
-    /** @var \Pharest\Config $config */
-    protected $config;
 
     public function injector()
     {
@@ -25,11 +23,17 @@ class Register
 
         $config->uri = $di->getShared('request')->getURI();
 
+        $config->client_ip = $di->getShared('request')->getClientAddress(true);
+
         /**
          * Shared configuration service
          */
         $di->setShared('config', function () use (&$config) {
             return $config;
+        });
+
+        $di->setShared('finder', function () use (&$config) {
+            return new Finder($config);
         });
 
         /**
@@ -48,18 +52,7 @@ class Register
             });
         }
 
-        $this->config = $config;
-
-        unset($config);
-
         return $di;
-    }
-
-    public function router()
-    {
-        $router = new Router();
-
-        return $router->collection($this->config);
     }
 
 }

@@ -17,4 +17,10 @@ class Config extends \Phalcon\Config
     /** @var string $uri */
     public $uri;
 
+    /** @var  string $client_ip */
+    public $client_ip;
+
+    /** @var \App\Models\User|\App\Models\Users $user */
+    public $user;
+
 }

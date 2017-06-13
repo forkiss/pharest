@@ -7,7 +7,9 @@ namespace Pharest;
  *
  * @package \Pharest\Controller
  *
- * @property \Pharest\Config config
+ * @property \Pharest\Validate\Validator validator
+ * @property \Pharest\Register\Finder    finder
+ * @property \Pharest\Config             config
  */
 class Controller extends \Phalcon\Di\Injectable implements \Phalcon\Mvc\ControllerInterface
 {
