@@ -17,15 +17,13 @@ class Validator extends \Phalcon\Validation
 
     protected $multi;
 
+    protected $match;
+
     public $input = [];
 
     public function __construct(\Pharest\Config &$config)
     {
-        if ($config->app->validate->accept === 'application/json') {
-            $this->input = $this->request->getJsonRawBody(true);
-        } else {
-            $this->input = $this->request->get();
-        }
+        $this->input = $this->request->getJsonRawBody(true);
 
         $this->multi = $config->app->validate->multi;
 
@@ -33,7 +31,7 @@ class Validator extends \Phalcon\Validation
             $this->filterXss($this->input);
         }
 
-        $this->require = $this->scope = $this->between = $this->len = [
+        $this->require = $this->scope = $this->between = $this->len = $this->match = [
             'keys'   => [],
             'detail' => ['cancelOnFail' => !$this->multi]
         ];
@@ -46,13 +44,15 @@ class Validator extends \Phalcon\Validation
 
     public function execute()
     {
-        $this->rule($this->require['keys'], new Type\PresenceOf($this->require['detail']));
+        $this->add($this->require['keys'], new Type\PresenceOf($this->require['detail']));
 
-        $this->rule($this->scope['keys'], new Type\InclusionIn($this->scope['detail']));
+        $this->add($this->scope['keys'], new Type\InclusionIn($this->scope['detail']));
 
-        $this->rule($this->len['keys'], new Type\StringLength($this->len['detail']));
+        $this->add($this->len['keys'], new Type\StringLength($this->len['detail']));
 
-        $this->rule($this->between['keys'], new Type\Between($this->between['detail']));
+        $this->add($this->between['keys'], new Type\Between($this->between['detail']));
+
+        $this->add($this->match['keys'], new Type\Regex($this->match['detail']));
 
         $notice = $this->validate($this->input);
 
@@ -98,6 +98,13 @@ class Validator extends \Phalcon\Validation
         return $this->get($key);
     }
 
+    public function match(string $key, string $pattern, string $message)
+    {
+        $this->appendMatch($key, $pattern, $message);
+
+        return $this->get($key);
+    }
+
     public function appendPresence(string $key, string $message)
     {
         $this->require['keys'][] = $key;
@@ -131,6 +138,13 @@ class Validator extends \Phalcon\Validation
         $this->between['detail']['minimum'][$key] = $minimum;
         $this->between['detail']['maximum'][$key] = $maximum;
         $this->between['detail']['message'][$key] = $message;
+    }
+
+    public function appendMatch(string $key, string $pattern, string $message)
+    {
+        $this->match['keys'][] = $key;
+        $this->match['detail']['message'][$key] = $message;
+        $this->match['detail']['pattern'][$key] = $pattern;
     }
 
     public function filterXss(array &$data)
