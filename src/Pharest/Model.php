@@ -5,6 +5,14 @@ namespace Pharest;
 
 class Model extends \Phalcon\Mvc\Model
 {
+
+    protected static $datetime;
+
+    public static function setDatetime($datetime)
+    {
+        self::$datetime = $datetime;
+    }
+
     /**
      * Allows to query a set of records that match the specified conditions
      *
@@ -58,5 +66,4 @@ class Model extends \Phalcon\Mvc\Model
             throw new \Pharest\Exception\ModelException(implode(',', $this->getMessages()), 100090);
         }
     }
-
 }

@@ -25,6 +25,8 @@ class Register
 
         $config->client_ip = $di->getShared('request')->getClientAddress(true);
 
+        \Pharest\Model::setDatetime($config->datetime);
+
         /**
          * Shared configuration service
          */
