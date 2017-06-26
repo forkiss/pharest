@@ -66,4 +66,12 @@ class Model extends \Phalcon\Mvc\Model
             throw new \Pharest\Exception\ModelException(implode(',', $this->getMessages()), 100090);
         }
     }
+
+    public function create($data = null, $whiteList = null)
+    {
+        if (parent::create($data) === false) {
+            throw new \Pharest\Exception\ModelException(implode(',', $this->getMessages()), 100090);
+        }
+    }
+
 }
