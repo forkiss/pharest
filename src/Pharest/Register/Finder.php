@@ -4,6 +4,9 @@ namespace Pharest\Register;
 
 class Finder
 {
+
+    public $uri;
+
     public $prefix;
 
     public $file;
@@ -17,7 +20,9 @@ class Finder
      */
     public function __construct(\Pharest\Config &$config)
     {
-        $this->parser($config->uri, $config->app->route->path);
+        $this->uri = $config->uri;
+
+        $this->parser($config->app->route->path);
     }
 
     public function make()
@@ -34,7 +39,7 @@ class Finder
     private function fail()
     {
         /** @var \Phalcon\Http\Response $response */
-        $response = \Phalcon\Di\FactoryDefault::getDefault()->getShared('response');
+        $response = \Phalcon\Di::getDefault()->getShared('response');
 
         $response->setStatusCode(404);
         $response->send();
@@ -42,14 +47,14 @@ class Finder
         exit();
     }
 
-    private function parser($url, $path)
+    private function parser($path)
     {
-        if (strpos($url, '?') !== false) {
-            $explode = explode('?', $url);
-            $url = $explode[0];
+        if (strpos($this->uri, '?') !== false) {
+            $explode = explode('?', $this->uri);
+            $this->uri = $explode[0];
         }
 
-        $uri = explode('/', $url);
+        $uri = explode('/', $this->uri);
 
         if (!isset($uri[1]) or !$uri[1]) {
             $this->fail();
@@ -64,7 +69,6 @@ class Finder
         if (!is_file($this->file)) {
             $this->fail();
         }
-
     }
 
 }

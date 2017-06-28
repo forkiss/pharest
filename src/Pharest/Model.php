@@ -74,4 +74,11 @@ class Model extends \Phalcon\Mvc\Model
         }
     }
 
+    public function update($data = null, $whiteList = null)
+    {
+        if (parent::update($data) === false) {
+            throw new \Pharest\Exception\ModelException(implode(',', $this->getMessages()), 100090);
+        }
+    }
+
 }

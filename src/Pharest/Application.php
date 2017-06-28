@@ -30,6 +30,8 @@ class Application
 
         $this->app->mount($this->app->finder->make());
 
+        unset($register);
+
         $this->app->notFound(function () {
             $this->app->response->setStatusCode(404, 'Not Found')->sendHeaders();
 
