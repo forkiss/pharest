@@ -13,6 +13,11 @@ class Model extends \Phalcon\Mvc\Model
         self::$datetime = $datetime;
     }
 
+    public static function getDatetime()
+    {
+        return self::$datetime;
+    }
+
     /**
      * Allows to query a set of records that match the specified conditions
      *

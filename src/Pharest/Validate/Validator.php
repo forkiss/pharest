@@ -44,6 +44,10 @@ class Validator extends \Phalcon\Validation
 
     public function execute()
     {
+        if (empty($this->input)) {
+            throw new \Phalcon\Validation\Exception('empty body');
+        }
+
         $this->add($this->require['keys'], new Type\PresenceOf($this->require['detail']));
 
         $this->add($this->scope['keys'], new Type\InclusionIn($this->scope['detail']));
@@ -57,16 +61,7 @@ class Validator extends \Phalcon\Validation
         $notice = $this->validate($this->input);
 
         if ($notice->valid()) {
-
-            if (!$this->multi) {
-                throw new \Pharest\Exception\ValidateException($notice->current()->getMessage());
-            }
-
-            $exception = new \Pharest\Exception\ValidateException('params invalid');
-
-            $exception->setNotice($notice);
-
-            throw $exception;
+            throw new \Phalcon\Validation\Exception($notice->current()->getMessage());
         }
     }
 

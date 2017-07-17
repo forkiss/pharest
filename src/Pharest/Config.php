@@ -23,4 +23,7 @@ class Config extends \Phalcon\Config
     /** @var \App\Models\User|\App\Models\Users $user */
     public $user;
 
+    /** @var string */
+    public $token;
+
 }

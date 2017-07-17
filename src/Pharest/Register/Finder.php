@@ -13,6 +13,8 @@ class Finder
 
     public $controller;
 
+    public $version;
+
     /**
      * Router constructor.
      *
@@ -60,15 +62,18 @@ class Finder
             $this->fail();
         }
 
+        $this->version = $uri[1];
+
         $this->controller = $uri[2] ?? 'index';
 
-        $this->file = APP_ROOT . $path . $uri[1] . '/' . $this->controller . '.php';
+        $this->prefix = '/' . $this->version . '/' . $this->controller;
 
-        $this->prefix = '/' . $uri[1] . '/' . $this->controller;
+        $this->file = APP_ROOT . $path . $this->prefix . '.php';
 
         if (!is_file($this->file)) {
             $this->fail();
         }
+
     }
 
 }
