@@ -7,7 +7,7 @@ class Register
 
     public function injector()
     {
-        $config = new \Pharest\Config(require_once APP_ROOT . '/app/config/config.php');
+        $config = new \Pharest\Config(require_once APP_ROOT . '/config/config.php');
 
         ini_set('date.timezone', $config->app->timezone);
 
