@@ -11,7 +11,7 @@ namespace Pharest;
  * @property \Pharest\Register\Finder    finder
  * @property \Pharest\Config             config
  */
-class Controller extends \Phalcon\Di\Injectable implements \Phalcon\Mvc\ControllerInterface
+abstract class Controller extends \Phalcon\Di\Injectable implements \Phalcon\Mvc\ControllerInterface
 {
     /**
      * Phalcon\Mvc\Controller constructor
