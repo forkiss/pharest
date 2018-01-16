@@ -37,6 +37,11 @@ class Validator extends \Phalcon\Validation
         ];
     }
 
+    public function setMulti(bool $multi)
+    {
+        $this->multi = $multi;
+    }
+
     public function get($key, $default = null)
     {
         return $this->input[$key] ?? $default;
@@ -44,8 +49,8 @@ class Validator extends \Phalcon\Validation
 
     public function execute()
     {
-        if (empty($this->input)) {
-            throw new \Phalcon\Validation\Exception('empty body');
+        if ($this->input === null) {
+            throw new \Phalcon\Validation\Exception('empty request body');
         }
 
         $this->add($this->require['keys'], new Type\PresenceOf($this->require['detail']));
@@ -61,7 +66,15 @@ class Validator extends \Phalcon\Validation
         $notice = $this->validate($this->input);
 
         if ($notice->valid()) {
-            throw new \Phalcon\Validation\Exception($notice->current()->getMessage());
+            if (!$this->multi) {
+                throw new \Phalcon\Validation\Exception($notice->current()->getMessage());
+            }
+
+            $exception = new \Pharest\Exception\ValidateException('params invalid');
+
+            $exception->setNotice($notice);
+
+            throw $exception;
         }
     }
 
