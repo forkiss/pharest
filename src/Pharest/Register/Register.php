@@ -25,6 +25,8 @@ class Register
 
         $config->client_ip = $di->getShared('request')->getClientAddress(true);
 
+        $config->request_id = md5($config->client_ip . explode(' ', microtime())[0]);
+
         \Pharest\Model::setDatetime($config->datetime);
 
         /**

@@ -8,15 +8,6 @@ class Application
     /** @var \Phalcon\Mvc\Micro $app */
     protected $app;
 
-    /** @var \Phalcon\Di\FactoryDefault $di */
-    protected $di;
-
-    /** @var \Phalcon\Mvc\Micro\Collection $finder */
-    protected $finder;
-
-    /** @var  string $uri */
-    protected $uri;
-
     /**
      * Handle constructor.
      */
@@ -52,6 +43,11 @@ class Application
         $this->app->handle();
     }
 
+    public function following(\Closure $closure)
+    {
+        $closure($this->app);
+    }
+
     public function middleware()
     {
         if (!class_exists(\App\Middleware\Kernel::class)) {
@@ -61,7 +57,7 @@ class Application
         $kernel = new \App\Middleware\Kernel();
 
         /** @var \Pharest\Middleware\Immediately $middleware */
-        foreach ($kernel->middleware as $middleware) {
+        foreach ($kernel->middleware as $key => $middleware) {
             $middleware = new $middleware();
 
             $middleware->call($this->app);

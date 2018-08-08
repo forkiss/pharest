@@ -14,7 +14,6 @@ class Model extends \Phalcon\Mvc\Model
     public function initialize()
     {
         \Phalcon\Mvc\Model::setup(['notNullValidations' => false]);
-        $this->setSchema("ebao");
     }
 
     public static function setDatetime($datetime)
